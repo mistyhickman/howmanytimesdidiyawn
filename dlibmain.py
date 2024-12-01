@@ -3,6 +3,7 @@ import dlib
 import numpy as np
 import pygame
 import time
+import logging
 from scipy.spatial import distance as dist
 
 # Initialize Pygame for sound playback
@@ -12,6 +13,9 @@ sound = pygame.mixer.Sound("./PopSound.wav")
 # Load Dlib's pre-trained face detector and facial landmarks model (68 landmarks)
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Initialize variables
 yawn_count = 0
@@ -35,6 +39,7 @@ def calculate_mouth_aspect_ratio(mouth_points):
 cap = cv2.VideoCapture(0)
 
 while True:
+    time.sleep(0.1)  # Add a sleep interval to reduce CPU usage
     ret, frame = cap.read()
     if not ret:
         break
@@ -83,7 +88,7 @@ while True:
 
         except IndexError:
             # Skip processing if 68 landmark points are not detected
-            print("Could not detect all facial landmarks. Skipping frame.")
+            logging.warning("Could not detect all facial landmarks. Skipping frame.")
 
     # Display yawn count on the screen
     cv2.putText(frame, f'Yawn Count: {yawn_count}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
@@ -97,6 +102,10 @@ while True:
 
 # Release resources
 cap.release()
+cv2.destroyAllWindows()
+
+# Output total yawn count to the terminal
+print(f"Total Yawns Recorded: {yawn_count}")
 cv2.destroyAllWindows()
 
 # Output total yawn count to the terminal

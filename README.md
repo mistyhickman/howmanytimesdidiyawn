@@ -7,6 +7,7 @@ Features
 Real-time yawn detection using a webcam feed.
 Alerts with a sound effect when a yawn is detected.
 Displays yawn count on the screen.
+Quit program by pressing 'q'.
 
 Prerequisites
 Python 3.x
