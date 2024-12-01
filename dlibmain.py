@@ -1,13 +1,21 @@
 import cv2
 import dlib
 import numpy as np
+import os
 import pygame
 import time
 from scipy.spatial import distance as dist
 
 # Initialize Pygame for sound playback
 pygame.mixer.init()
-sound = pygame.mixer.Sound("./PopSound.wav")
+
+sound_path = "./PopSound.wav"
+if os.path.exists(sound_path):
+    sound = pygame.mixer.Sound(sound_path)
+else:
+    print(f"Warning: Sound file '{sound_path}' not found. Sound will be disabled.")
+    sound = None
+
 
 # Load Dlib's pre-trained face detector and facial landmarks model (68 landmarks)
 detector = dlib.get_frontal_face_detector()
@@ -25,6 +33,15 @@ close_mouth_frames = 0  # Frames to confirm mouth is closed
 
 # Define function to calculate mouth aspect ratio (MAR)
 def calculate_mouth_aspect_ratio(mouth_points):
+    """
+    Calculate the Mouth Aspect Ratio (MAR) to detect yawning.
+
+    Parameters:
+    mouth_points (numpy.ndarray): Array of 20 points representing the mouth landmarks.
+
+    Returns:
+    float: The mouth aspect ratio.
+    """
     A = dist.euclidean(mouth_points[2], mouth_points[10])  # Vertical distance
     B = dist.euclidean(mouth_points[4], mouth_points[8])   # Vertical distance
     C = dist.euclidean(mouth_points[0], mouth_points[6])   # Horizontal distance
@@ -69,7 +86,8 @@ while True:
                 if consecutive_yawn_frames >= required_yawn_frames and not yawn_active and (time.time() - last_yawn_time) > cooldown_period:
                     yawn_count += 1
                     last_yawn_time = time.time()
-                    sound.play()
+                    if sound:
+                        sound.play()
                     print("Yawn detected!")
                     yawn_active = True  # Mark yawn as active to avoid re-counting
             else:
@@ -101,3 +119,6 @@ cv2.destroyAllWindows()
 
 # Output total yawn count to the terminal
 print(f"Total Yawns Recorded: {yawn_count}")
+
+
+
